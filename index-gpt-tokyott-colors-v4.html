@@ -1,0 +1,2370 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="NISAをゼロから理解し、主要インデックス（S&P500/オルカン等）と始め方、積立シミュレーションまで。" />
+  <title>NISA はじめてのガイド｜Liquid Glass</title>
+
+  <style>
+    :root{
+      /* =========================
+         TOKYOTT-INSPIRED PALETTE
+         (color-only redesign)
+         ========================= */
+      --bgA:#fbfaf7;          /* warm off-white */
+      --bgB:#f2f0e8;          /* warm sand */
+      --bgGlow1:rgba(201,162,74,.18); /* gold glow */
+      --bgGlow2:rgba(11,28,44,.10);   /* navy glow */
+
+      --ink:#0f1115;          /* main text */
+      --ink2:#1c2530;         /* headings */
+      --muted:#5b6168;        /* secondary */
+      --muted2:#7a8087;       /* tertiary */
+
+      --sky:#0b1c2c;          /* brand navy (main) */
+      --mint:#c9a24a;         /* gold (accent) */
+      --coral:#2e6f86;        /* teal (sub-accent) */
+      --blue:#0b1c2c;         /* alias */
+
+      --shadow: 0 10px 26px rgba(11,28,44,.08);
+      --shadow2: 0 16px 44px rgba(11,28,44,.10);
+
+      --r-xxl: 28px;
+      --r-xl: 22px;
+      --r-lg: 16px;
+
+      --max: 1080px;
+      --pad: clamp(18px, 4vw, 34px);
+
+      --h1: clamp(34px, 5.2vw, 56px);
+      --h2: clamp(22px, 3.6vw, 34px);
+      --h3: 20px;
+
+      --small: 13px;
+
+      --ease: cubic-bezier(.2,.8,.2,1);
+      --ease2: cubic-bezier(.16, 1, .3, 1);
+
+      --pg1: rgba(201,162,74,.14);
+      --pg2: rgba(11,28,44,.08);
+    }
+
+*{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      color:var(--ink);
+
+      /* Apple-like system stack (SF Pro on Apple devices) */
+      font-family:
+        -apple-system, BlinkMacSystemFont,
+        "SF Pro Display","SF Pro Text",
+        system-ui, "Helvetica Neue", Helvetica, Arial,
+        "Hiragino Sans","Hiragino Kaku Gothic ProN",
+        "Noto Sans JP","Yu Gothic","Meiryo", sans-serif;
+
+      overflow-x:hidden;
+
+      /* =========================
+         COLOR (UPDATED ONLY)
+         ========================= */
+      background:
+        radial-gradient(1200px 700px at 18% 6%, var(--bgGlow1), transparent 60%),
+        radial-gradient(900px 600px at 82% -12%, var(--bgGlow2), transparent 62%),
+        linear-gradient(180deg, var(--bgA) 0%, var(--bgB) 88%);
+      transition: background .65s var(--ease);
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    b,strong{ font-weight: 860; }
+    .container{ width: min(var(--max), 92vw); margin:0 auto; }
+
+    /* ===== Liquid Glass surface (shared) ===== */
+    .glass{
+      position:relative;
+      border-radius: var(--r-xl);
+
+      /* =========================
+         COLOR (UPDATED ONLY)
+         ========================= */
+      background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.46));
+      border: 1px solid rgba(255,255,255,.62);
+
+      box-shadow: var(--shadow2);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      overflow:hidden;
+      transform: translateZ(0);
+    }
+    .glass::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(900px 260px at 18% 0%, rgba(145,214,255,.22), transparent 60%),
+        radial-gradient(720px 220px at 82% 10%, rgba(11,28,44,.10), transparent 55%),
+        linear-gradient(135deg, rgba(255,255,255,.62), rgba(255,255,255,0) 40%, rgba(255,255,255,.26));
+      opacity:.95;
+      pointer-events:none;
+      filter: none;
+    }
+    .glass::after{
+      content:"";
+      position:absolute; inset:-60%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+      transform: rotate(18deg) translateX(-20%);
+      opacity:.38;
+      animation: glassSheen 7.6s var(--ease) infinite;
+      pointer-events:none;
+    }
+    @keyframes glassSheen{
+      0%,100%{ transform: rotate(18deg) translateX(-18%); opacity:.26; }
+      55%{ transform: rotate(18deg) translateX(18%); opacity:.44; }
+    }
+    .glass > *{ position:relative; z-index:1; }
+
+    /* ===== Header ===== */
+    header{
+      position: sticky; top:0; z-index:50;
+      background: rgba(255,255,255,.40);
+      border-bottom: 1px solid rgba(10,30,70,.06);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    header::before{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(900px 240px at 15% 0%, rgba(145,214,255,.16), transparent 60%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .nav{ position:relative; display:flex; align-items:center; justify-content:space-between; gap:16px; padding: 14px 0; }
+    .brand{ display:flex; align-items:center; gap:12px; font-weight: 900; letter-spacing: -.01em; }
+    .mark{
+      width: 34px; height: 34px; border-radius: 13px;
+      background: linear-gradient(135deg, rgba(11,28,44,1), rgba(145,214,255,1));
+      box-shadow: 0 18px 38px rgba(11,28,44,.20);
+      position:relative; overflow:hidden;
+    }
+    .mark::after{
+      content:"";
+      position:absolute; inset:-60%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent);
+      transform: rotate(22deg);
+      animation: sheen 1.7s var(--ease) infinite;
+    }
+    @keyframes sheen{
+      0%{ transform: translateX(-45%) rotate(22deg); opacity:.0;}
+      25%{ opacity:.9;}
+      100%{ transform: translateX(45%) rotate(22deg); opacity:.0;}
+    }
+    .navLinks{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .navLinks a{
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: var(--small);
+      color: rgba(6,26,51,.74);
+      transition: transform .25s var(--ease), background .25s var(--ease), color .25s var(--ease);
+      background: rgba(255,255,255,.20);
+      border: 1px solid rgba(255,255,255,.30);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      white-space: nowrap;
+    }
+    .navLinks a:hover{
+      transform: translateY(-1px);
+      background: rgba(11,28,44,.10);
+      color: rgba(6,26,51,.92);
+    }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding: 13px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(11,28,44,.14);
+      background: #fff;
+      box-shadow: var(--shadow);
+      font-weight: 820;
+      letter-spacing: -.01em;
+      transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease), border-color .25s var(--ease);
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-2px); box-shadow: 0 22px 64px rgba(10,25,60,.14); background: rgba(255,255,255,.38); }
+    .btn.primary{
+      border: 1px solid rgba(11,28,44,.18);
+      background: linear-gradient(135deg, var(--sky), #16314a);
+      color:#fff;
+      box-shadow: 0 18px 44px rgba(11,28,44,.22);
+    }
+    .btn.primary:hover{ transform: translateY(-3px); box-shadow: 0 34px 96px rgba(11,28,44,.26); }
+
+    /* ===== Sections ===== */
+    section{ padding: 98px 0; }
+    @media (max-width: 980px){ section{ padding: 76px 0; } }
+
+    .sectionHead{
+      display:grid;
+      gap: 14px;
+      margin-bottom: 34px;
+      max-width: 84ch;
+    }
+    h1{ margin:0; font-size: var(--h1); line-height:1.02; letter-spacing: -0.03em; }
+    h2{ margin:0; font-size: var(--h2); line-height:1.12; letter-spacing: -0.02em; }
+    h3{ margin:0; font-size: var(--h3); line-height:1.25; letter-spacing: -0.01em; color: var(--ink2); } /* COLOR UPDATED ONLY */
+    p{ margin:0; font-size: var(--body); line-height: 1.95; color: var(--muted); } /* COLOR UPDATED ONLY */
+
+    .kicker{
+      display:inline-flex; align-items:center; gap:10px;
+      width: fit-content;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.34);
+      border: 1px solid rgba(255,255,255,.46);
+      color: rgba(6,26,51,.78);
+      font-size: var(--small);
+      font-weight: 820;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .kicker i{
+      width:10px; height:10px; border-radius: 3px;
+      /* COLOR UPDATED ONLY */
+      background: linear-gradient(135deg, var(--mint), var(--sky));
+      display:inline-block;
+    }
+    .fine{ font-size: var(--small); color: var(--muted2); line-height: 1.85; } /* COLOR UPDATED ONLY */
+
+    /* ===== Hero ===== */
+    .hero{ padding-top: 76px; padding-bottom: 56px; }
+    .heroGrid{ display:grid; grid-template-columns: 1.18fr .82fr; gap: 34px; align-items: center; }
+    @media (max-width: 980px){ .heroGrid{ grid-template-columns:1fr; } }
+    .heroLead{ margin-top: 18px; max-width: 66ch; font-size: clamp(18px, 1.4vw, 20px); color: rgba(6,26,51,.72); }
+    .heroActions{ margin-top: 26px; display:flex; flex-wrap:wrap; gap: 12px; align-items:center; }
+
+    .heroCard{
+      padding: var(--pad);
+      border-radius: var(--r-xxl);
+      box-shadow: var(--shadow);
+      min-height: 430px;
+      display:grid;
+      gap: 16px;
+    }
+
+    .blob{
+      position:absolute;
+      border-radius: 999px;
+      opacity:.88;
+      mix-blend-mode: multiply;
+      pointer-events:none;
+      transform: translate3d(0,0,0);
+      transition: transform .18s linear;
+      filter: saturate(1.08);
+    }
+    .b1{ width: 300px; height:300px; left:-100px; top:-125px;
+      background: radial-gradient(circle at 30% 30%, rgba(145,214,255,.86), rgba(11,28,44,.14));
+    }
+    .b2{ width: 260px; height:260px; right:-100px; top: 18px;
+      background: radial-gradient(circle at 30% 30%, rgba(11,28,44,.34), rgba(215,236,255,.88));
+    }
+    .b3{ width: 360px; height:360px; right:-155px; bottom:-175px;
+      background: radial-gradient(circle at 30% 30%, rgba(215,236,255,.90), rgba(11,28,44,.12));
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      width: fit-content;
+      padding: 11px 15px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.46);
+      background: rgba(255,255,255,.28);
+      font-size: var(--small);
+      color: rgba(6,26,51,.82);
+      font-weight: 860;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .pill .spark{ width: 10px; height: 10px; border-radius: 3px; background: linear-gradient(135deg, rgba(11,28,44,1), rgba(145,214,255,1)); }
+
+    .stats{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
+    .stat{
+      border-radius: var(--r-lg);
+      padding: 18px 18px;
+      background: rgba(255,255,255,.26);
+      border: 1px solid rgba(255,255,255,.44);
+      box-shadow: var(--shadow2);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .stat .k{ font-size: var(--small); color: rgba(6,26,51,.62); margin-bottom: 7px; font-weight: 780; }
+    .stat .v{ font-size: clamp(20px, 1.6vw, 24px); font-weight: 920; letter-spacing: -.01em; color: rgba(6,26,51,.92); }
+
+    /* ===== Cards / grids ===== */
+    .grid2{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .grid3{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 980px){ .grid2,.grid3{ grid-template-columns:1fr; } }
+
+    .card{ padding: var(--pad); border-radius: var(--r-xxl); }
+
+    .badge{
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.30);
+      border: 1px solid rgba(255,255,255,.46);
+      font-size: var(--small);
+      color: rgba(6,26,51,.82);
+      font-weight: 860;
+      width: fit-content;
+      margin-bottom: 16px;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .badge span{
+      width: 9px; height: 9px; border-radius: 3px;
+      /* COLOR UPDATED ONLY */
+      background: linear-gradient(135deg, var(--blue), var(--coral));
+      display:inline-block;
+    }
+
+    ul{ margin: 16px 0 0; padding-left: 22px; }
+    li{ font-size: var(--body); line-height: 1.9; color: rgba(6,26,51,.74); margin: 9px 0; }
+
+    /* ===== Parallax (subtle) ===== */
+    .parallax{ will-change: transform, filter, opacity; transform: translate3d(0,0,0); }
+
+    /* ===== Flow timeline (NO vertical line, bubble chain instead) ===== */
+    .flowWrap{
+      border-radius: 56px;
+      padding: clamp(26px, 3.4vw, 46px);
+      box-shadow: var(--shadow);
+    }
+    .flowHeader{
+      display:flex; align-items:flex-end; justify-content:space-between; gap: 16px; flex-wrap:wrap;
+      margin-bottom: 26px;
+    }
+    .flowHeader h3{
+      font-size: clamp(26px, 2.3vw, 34px);
+      font-weight: 940;
+      margin:0;
+      letter-spacing: -0.02em;
+    }
+    .flowHint{ color: rgba(6,26,51,.62); font-size: var(--small); line-height: 1.7; max-width: 72ch; }
+
+    .chip{
+      display:inline-flex; align-items:center; gap:10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.30);
+      border: 1px solid rgba(255,255,255,.46);
+      font-size: var(--small);
+      font-weight: 880;
+      color: rgba(6,26,51,.84);
+      width: fit-content;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .chip .dot{
+      width: 10px; height: 10px;
+      border-radius: 4px;
+      /* COLOR UPDATED ONLY */
+      background: linear-gradient(135deg, var(--blue), var(--mint));
+    }
+
+    .timeline{
+      position: relative;
+      display:grid;
+      gap: 26px; /* bigger spacing */
+      padding: 10px 0 18px;
+    }
+
+    .tItem{
+      display:grid;
+      grid-template-columns: 128px 1fr;
+      gap: 24px;
+      align-items: stretch;
+      position: relative;
+    }
+
+    .node{
+      position: relative;
+      display:grid;
+      place-items:center;
+      padding-top: 12px;
+      isolation:isolate;
+    }
+
+    /* “bubble chain” connector (no single vertical line) */
+    .tItem:not(:last-child) .node::after{
+      content:"";
+      position:absolute;
+      top: 102px; /* below badge */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: calc(100% + 26px);
+      pointer-events:none;
+      z-index:0;
+      background:
+        radial-gradient(circle, rgba(255,255,255,.70) 0 36%, rgba(11,28,44,.12) 37% 55%, transparent 56%) 50% 0% / 28px 28px repeat-y;
+      filter: none;
+      opacity: .55;
+    }
+    .tItem:not(:last-child) .node::before{
+      content:"";
+      position:absolute;
+      top: 98px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+      height: calc(100% + 30px);
+      background: radial-gradient(ellipse at 50% 10%, rgba(145,214,255,.16), transparent 55%);
+      opacity: .55;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .nodeBadge{
+      width: 84px; height: 84px;
+      border-radius: 30px;
+      display:grid; place-items:center;
+      color: rgba(6,26,51,.86);
+      font-weight: 950;
+      font-size: 22px;
+      letter-spacing: -.02em;
+
+      background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.30));
+      border: 1px solid rgba(255,255,255,.55);
+      box-shadow: 0 26px 70px rgba(10,25,60,.16);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+
+      position:relative;
+      overflow:hidden;
+      transition: transform .45s var(--ease), opacity .45s var(--ease), box-shadow .45s var(--ease);
+      opacity: .78;
+      z-index:1;
+    }
+    .nodeBadge::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(40px 40px at 22% 20%, rgba(255,255,255,.78), transparent 60%),
+        radial-gradient(70px 55px at 75% 10%, rgba(145,214,255,.26), transparent 60%);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .nodeBadge::after{
+      content:"";
+      position:absolute; inset:-60%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.50), transparent);
+      transform: rotate(18deg) translateX(-14%);
+      opacity:.24;
+      animation: glassSheen 9s var(--ease) infinite;
+      pointer-events:none;
+    }
+
+    .tCard{
+      padding: clamp(24px, 2.8vw, 38px); /* bigger */
+      border-radius: 44px;
+      background: rgba(255,255,255,.38);
+      border: 1px solid rgba(255,255,255,.46);
+      box-shadow: 0 22px 74px rgba(10,25,60,.12);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      transition: transform .45s var(--ease), box-shadow .45s var(--ease), opacity .45s var(--ease);
+      opacity: .82;
+      position:relative;
+      overflow:hidden;
+    }
+    .tCard::after{
+      content:"";
+      position:absolute; inset:-60%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
+      transform: rotate(18deg) translateX(-12%);
+      opacity:.25;
+      animation: glassSheen 8.5s var(--ease) infinite;
+      pointer-events:none;
+    }
+    .tCard > *{ position:relative; z-index:1; }
+
+    .tTop{
+      display:flex; align-items:center; justify-content:space-between; gap: 12px; flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+
+    .tTitle{
+      font-size: clamp(22px, 2.05vw, 30px);
+      font-weight: 960;
+      letter-spacing: -.02em;
+      color: rgba(6,26,51,.94);
+      line-height: 1.2;
+      margin-top: 6px;
+    }
+    .tText{ margin-top: 12px; }
+
+    .tItem.active .tCard{
+      opacity: 1;
+      transform: translateY(-8px);
+      box-shadow: 0 34px 120px rgba(11,28,44,.16);
+    }
+    .tItem.active .nodeBadge{
+      opacity: 1;
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 34px 96px rgba(11,28,44,.18);
+    }
+    .tItem.active .node::after{ opacity: .75; }
+    .tItem.active .node::before{ opacity: .75; }
+
+    /* ===== Simulation ===== */
+    .simWrap{
+      border-radius: 56px;
+      padding: clamp(26px, 3.4vw, 46px);
+      box-shadow: var(--shadow);
+      display:grid;
+      gap: 22px;
+    }
+    .simGrid{
+      display:grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    @media (max-width: 980px){ .simGrid{ grid-template-columns:1fr; } }
+
+    .simPanel{
+      border-radius: 44px;
+      padding: clamp(22px, 2.6vw, 34px);
+      background: rgba(255,255,255,.34);
+      border: 1px solid rgba(255,255,255,.46);
+      box-shadow: var(--shadow2);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      position:relative;
+      overflow:hidden;
+    }
+    .simPanel::after{
+      content:"";
+      position:absolute; inset:-60%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.42), transparent);
+      transform: rotate(18deg) translateX(-14%);
+      opacity:.20;
+      animation: glassSheen 9.2s var(--ease) infinite;
+      pointer-events:none;
+    }
+    .simPanel > *{ position:relative; z-index:1; }
+
+    .simTitle{
+      font-size: clamp(22px, 2.05vw, 30px);
+      font-weight: 960;
+      letter-spacing: -.02em;
+      color: rgba(6,26,51,.94);
+      line-height: 1.2;
+      margin: 6px 0 14px;
+    }
+    .field{
+      display:grid;
+      gap: 10px;
+      margin: 14px 0;
+      padding: 14px 14px;
+      border-radius: 28px;
+      background: rgba(255,255,255,.22);
+      border: 1px solid rgba(255,255,255,.44);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .fieldRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+    .label{
+      font-size: var(--small);
+      color: rgba(6,26,51,.64);
+      font-weight: 860;
+      letter-spacing: -.01em;
+    }
+    .valuePill{
+      font-size: var(--small);
+      font-weight: 920;
+      color: rgba(6,26,51,.84);
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.30);
+      border: 1px solid rgba(255,255,255,.46);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      white-space: nowrap;
+    }
+    input[type="range"]{
+      width: 100%;
+      accent-color: var(--blue);
+    }
+    .presetRow{
+      display:flex; gap: 10px; flex-wrap:wrap;
+      margin-top: 10px;
+    }
+    .miniBtn{
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.46);
+      background: rgba(255,255,255,.26);
+      box-shadow: var(--shadow2);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      font-weight: 880;
+      font-size: var(--small);
+      cursor:pointer;
+      transition: transform .2s var(--ease), background .2s var(--ease);
+      user-select:none;
+    }
+    .miniBtn:hover{ transform: translateY(-1px); background: rgba(11,28,44,.08); }
+
+    .results{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (max-width: 520px){ .results{ grid-template-columns:1fr; } }
+    .resCard{
+      border-radius: 34px;
+      padding: 18px 18px;
+      background: rgba(255,255,255,.26);
+      border: 1px solid rgba(255,255,255,.44);
+      box-shadow: var(--shadow2);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .resK{
+      font-size: var(--small);
+      color: rgba(6,26,51,.62);
+      font-weight: 860;
+      margin-bottom: 8px;
+    }
+    .resV{
+      font-size: clamp(20px, 1.8vw, 28px);
+      font-weight: 960;
+      letter-spacing: -.02em;
+      color: rgba(6,26,51,.92);
+      line-height: 1.2;
+    }
+
+    .chartWrap{
+      border-radius: 44px;
+      padding: clamp(18px, 2.2vw, 26px);
+      background: rgba(255,255,255,.34);
+      border: 1px solid rgba(255,255,255,.46);
+      box-shadow: var(--shadow2);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      position:relative;
+      overflow:hidden;
+    }
+    .chartHead{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+      margin-bottom: 12px;
+    }
+    .legend{
+      display:flex; gap: 10px; flex-wrap:wrap; align-items:center;
+      font-size: var(--small);
+      color: rgba(6,26,51,.66);
+      font-weight: 840;
+    }
+    .legItem{ display:inline-flex; gap: 8px; align-items:center; padding: 8px 12px; border-radius: 999px;
+      background: rgba(255,255,255,.22); border: 1px solid rgba(255,255,255,.44);
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+    }
+    .swatch{ width: 12px; height: 12px; border-radius: 4px; display:inline-block; }
+    .sw1{ background: rgba(6,26,51,.38); }
+    .sw2{ background: linear-gradient(135deg, rgba(11,28,44,1), rgba(145,214,255,1)); }
+
+    canvas{
+      width: 100%;
+      height: 320px;
+      display:block;
+      border-radius: 34px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.42);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    /* ===== FAQ ===== */
+    .faqWrap{ display:grid; gap: 14px; max-width: 980px; }
+    .faqItem{
+      border-radius: var(--r-xxl);
+      background: rgba(255,255,255,.34);
+      border: 1px solid rgba(255,255,255,.46);
+      box-shadow: var(--shadow2);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      overflow:hidden;
+      position:relative;
+    }
+    .faqItem::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(900px 260px at 20% 0%, rgba(145,214,255,.16), transparent 60%);
+      opacity:.95; pointer-events:none;
+    }
+    .faqBtn{
+      position:relative; z-index:1;
+      width:100%;
+      appearance:none;
+      background: transparent;
+      border: 0;
+      padding: 20px clamp(20px, 2.5vw, 30px);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+      text-align:left;
+    }
+    .faqQ{
+      font-size: clamp(17px, 1.35vw, 20px);
+      font-weight: 930;
+      letter-spacing: -.01em;
+      color: rgba(6,26,51,.94);
+      line-height: 1.35;
+    }
+    .faqIcon{
+      width: 42px; height: 42px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.46);
+      background: rgba(255,255,255,.26);
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+      transition: transform .25s var(--ease), background .25s var(--ease);
+      color: rgba(6,26,51,.74);
+      font-weight: 950;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .faqBody{
+      position:relative; z-index:1;
+      height: 0;
+      overflow:hidden;
+      transition: height .35s var(--ease);
+      border-top: 1px solid rgba(255,255,255,.40);
+      background: rgba(255,255,255,.22);
+    }
+    .faqInner{
+      padding: 16px clamp(20px, 2.5vw, 30px) 22px;
+      font-size: var(--body);
+      color: rgba(6,26,51,.74);
+      line-height: 1.95;
+    }
+    .faqItem.open .faqIcon{ transform: rotate(45deg); background: rgba(11,28,44,.08); }
+
+    /* ===== Footer ===== */
+    footer{ padding: 18px 0 34px; color: rgba(6,26,51,.58); font-size: var(--small); line-height: 1.9; }
+    .foot{ display:flex; gap: 12px; justify-content:space-between; flex-wrap:wrap; border-top: 1px solid rgba(10,30,70,.06); padding-top: 16px; }
+
+    /* ===== Pixel Penguin Loader ===== */
+    .loader{
+      position:fixed; inset:0; z-index:9999;
+      display:grid; place-items:center;
+      background:
+        radial-gradient(1200px 760px at 32% 28%, rgba(145,214,255,.26), transparent 60%),
+        radial-gradient(900px 650px at 80% 10%, rgba(11,28,44,.12), transparent 62%),
+        linear-gradient(180deg, rgba(255,255,255,1), rgba(246,249,255,1));
+      transition: opacity .55s var(--ease), visibility .55s var(--ease);
+      overflow:hidden;
+    }
+    .loader.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+
+    .loaderStage{
+      width:min(760px, 92vw);
+      padding: 26px 26px 22px;
+      border-radius: 52px;
+      background: rgba(255,255,255,.40);
+      border: 1px solid rgba(255,255,255,.48);
+      box-shadow: 0 50px 150px rgba(10,25,60,.18);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      position:relative;
+      overflow:hidden;
+    }
+    .loaderStage::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background:
+        radial-gradient(1000px 320px at 18% 0%, rgba(145,214,255,.18), transparent 60%),
+        radial-gradient(900px 280px at 85% 10%, rgba(11,28,44,.10), transparent 55%);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .loaderStage::after{
+      content:"";
+      position:absolute; inset:-60%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+      transform: rotate(18deg) translateX(-18%);
+      opacity:.30;
+      animation: glassSheen 7.8s var(--ease) infinite;
+      pointer-events:none;
+    }
+    .loaderStage > *{ position:relative; z-index:1; }
+
+    .loadTop{
+      display:flex; align-items:center; justify-content:space-between; gap: 14px; flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+    .loadTitle{
+      display:flex; align-items:center; gap:12px;
+      font-weight: 920;
+      letter-spacing: -.01em;
+      font-size: clamp(16px, 1.2vw, 18px);
+      color: rgba(6,26,51,.88);
+    }
+    .loadPct{
+      font-weight: 920;
+      color: rgba(6,26,51,.62);
+      font-size: var(--small);
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.26);
+      border: 1px solid rgba(255,255,255,.46);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .pixelLane{
+      height: 150px;
+      border-radius: 38px;
+      background: rgba(255,255,255,.22);
+      border: 1px solid rgba(255,255,255,.44);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      position:relative;
+      overflow:hidden;
+    }
+    .pixelLane .ground{
+      position:absolute; left:0; right:0; bottom:0; height: 56px;
+      background:
+        repeating-linear-gradient(90deg,
+          rgba(6,26,51,.07) 0 10px,
+          rgba(6,26,51,.04) 10px 20px
+        );
+      opacity:.85;
+      border-top: 1px solid rgba(255,255,255,.34);
+    }
+    .pixelLane .stars{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(circle at 12% 35%, rgba(11,28,44,.18) 0 2px, transparent 3px),
+        radial-gradient(circle at 22% 18%, rgba(145,214,255,.22) 0 2px, transparent 3px),
+        radial-gradient(circle at 46% 28%, rgba(11,28,44,.14) 0 2px, transparent 3px),
+        radial-gradient(circle at 74% 22%, rgba(145,214,255,.20) 0 2px, transparent 3px),
+        radial-gradient(circle at 86% 36%, rgba(11,28,44,.12) 0 2px, transparent 3px);
+      opacity:.7;
+      filter: none;
+    }
+
+    .penguin{
+      position:absolute;
+      left: -90px;
+      bottom: 26px;
+      width: 72px;
+      height: 72px;
+      image-rendering: pixelated;
+      background-size: 72px 72px;
+      background-repeat:no-repeat;
+      background-position:center;
+      animation:
+        walkAcross 2.8s linear infinite,
+        stepFrame .45s steps(1) infinite;
+      filter: drop-shadow(0 14px 22px rgba(10,25,60,.18));
+    }
+
+    @keyframes walkAcross{
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(calc(min(760px, 92vw) - 40px + 90px)); }
+    }
+    @keyframes stepFrame{
+      0%,49% { background-image: var(--pg1); }
+      50%,100%{ background-image: var(--pg2); }
+    }
+
+    .bubble{
+      position:absolute;
+      left: 90px;
+      bottom: 95px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.34);
+      border: 1px solid rgba(255,255,255,.46);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      font-size: var(--small);
+      color: rgba(6,26,51,.70);
+      opacity: .0;
+      transform: translateY(6px);
+      animation: bubblePop 2.8s var(--ease) infinite;
+      white-space: nowrap;
+    }
+    .bubble::after{
+      content:"";
+      position:absolute;
+      left: 14px;
+      bottom:-8px;
+      width: 14px; height: 14px;
+      background: rgba(255,255,255,.34);
+      border-right: 1px solid rgba(255,255,255,.46);
+      border-bottom: 1px solid rgba(255,255,255,.46);
+      transform: rotate(45deg);
+      border-radius: 4px;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    @keyframes bubblePop{
+      0%{ opacity:0; transform: translateY(8px); }
+      12%{ opacity:1; transform: translateY(0); }
+      55%{ opacity:1; }
+      70%{ opacity:0; transform: translateY(-6px); }
+      100%{ opacity:0; }
+    }
+
+    .loadBar{
+      margin-top: 14px;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(6,26,51,.08);
+      border: 1px solid rgba(255,255,255,.44);
+      overflow:hidden;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .loadBar .fill{
+      height:100%;
+      width:0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(11,28,44,1), rgba(145,214,255,1));
+      box-shadow: 0 10px 22px rgba(11,28,44,.18);
+      transition: width .45s var(--ease2);
+    }
+    .loadNote{
+      margin-top: 12px;
+      color: rgba(6,26,51,.60);
+      font-size: var(--small);
+      line-height: 1.8;
+    }
+
+    /* ===== Mobile tuning (<= 768px) ===== */
+    @media (max-width: 768px) {
+      section { padding: 64px 0; }
+      .container { width: min(92vw, 680px); }
+
+      h1 { font-size: clamp(42px, 10vw, 52px); line-height: 1.05; }
+      h2 { font-size: clamp(28px, 7vw, 34px); line-height: 1.15; }
+      h3 { font-size: 22px; }
+      p, li { font-size: 17px; line-height: 1.9; }
+
+      .grid2, .grid3 { gap: 24px; }
+      .card { padding: 28px 26px; }
+
+      /* simulation canvas shorter on mobile */
+      canvas { height: 260px; }
+
+      /* header links a bit tighter */
+      .navLinks a { padding: 10px 10px; }
+    }
+
+    /* ===== Step4 Flow – Mobile: number inside card ===== */
+    @media (max-width: 768px) {
+      .tItem { grid-template-columns: 1fr; }
+      .node { display: none; }
+      .tCard { padding: 64px 28px 32px; border-radius: 36px; }
+
+      .tCard::before{
+        content: attr(data-step);
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: .02em;
+        color: rgba(6,26,51,.85);
+        background: rgba(255,255,255,.55);
+        border: 1px solid rgba(255,255,255,.6);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        z-index: 2;
+      }
+      .tTitle { margin-top: 14px; }
+    }
+
+    /* ===== Mobile Nav (added) ===== */
+    .menuBtn{
+      display:none;
+      width: 44px; height: 44px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.46);
+      background: rgba(255,255,255,.26);
+      box-shadow: var(--shadow2);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      cursor:pointer;
+      align-items:center; justify-content:center;
+      transition: transform .2s var(--ease), background .2s var(--ease);
+      user-select:none;
+    }
+    .menuBtn:hover{ transform: translateY(-1px); background: rgba(11,28,44,.08); }
+    .menuIcon{ width: 20px; height: 14px; position:relative; }
+    .menuIcon span{
+      position:absolute; left:0; right:0; height:2px; border-radius: 999px;
+      background: rgba(6,26,51,.72);
+    }
+    .menuIcon span:nth-child(1){ top:0; }
+    .menuIcon span:nth-child(2){ top:6px; }
+    .menuIcon span:nth-child(3){ top:12px; }
+
+    /* Drawer */
+    .navDrawer{
+      position: fixed;
+      inset: 0;
+      display:none;
+      z-index: 80;
+    }
+    .navOverlay{
+      position:absolute; inset:0;
+      background: rgba(7,26,51,.24);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      opacity:0;
+      transition: opacity .28s var(--ease);
+    }
+    .navPanel{
+      position:absolute;
+      top: 10px; right: 10px; left: 10px;
+      border-radius: 28px;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.52));
+      border: 1px solid rgba(255,255,255,.62);
+      box-shadow: 0 40px 120px rgba(10,25,60,.18);
+      transform: translateY(-10px);
+      opacity:0;
+      transition: transform .28s var(--ease), opacity .28s var(--ease);
+      max-height: calc(100svh - 20px);
+      overflow:auto;
+    }
+    .navPanelHead{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding: 6px 4px 10px;
+      border-bottom: 1px solid rgba(10,30,70,.08);
+      margin-bottom: 10px;
+    }
+    .navPanelTitle{
+      font-weight: 920;
+      letter-spacing: -.01em;
+      color: rgba(6,26,51,.88);
+      font-size: 15px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .closeBtn{
+      width: 44px; height: 44px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.46);
+      background: rgba(255,255,255,.28);
+      display:grid; place-items:center;
+      cursor:pointer;
+      box-shadow: var(--shadow2);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      transition: transform .2s var(--ease), background .2s var(--ease);
+    }
+    .closeBtn:hover{ transform: translateY(-1px); background: rgba(11,28,44,.08); }
+    .closeX{
+      width: 18px; height: 18px; position:relative;
+    }
+    .closeX::before,.closeX::after{
+      content:""; position:absolute; inset:0;
+      margin:auto;
+      width: 18px; height: 2px; border-radius: 999px;
+      background: rgba(6,26,51,.72);
+      top: 50%;
+    }
+    .closeX::before{ transform: translateY(-50%) rotate(45deg); }
+    .closeX::after{ transform: translateY(-50%) rotate(-45deg); }
+
+    .navPanelLinks{
+      display:grid;
+      gap: 8px;
+      padding: 6px 2px 10px;
+    }
+    .navPanelLinks a{
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 12px;
+      padding: 14px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.34);
+      border: 1px solid rgba(255,255,255,.50);
+      font-size: 15px;
+      color: rgba(6,26,51,.86);
+      font-weight: 860;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .navPanelLinks a:active{ transform: scale(.99); }
+    .navPanelLinks a .chev{
+      width: 8px; height: 8px;
+      border-right: 2px solid rgba(6,26,51,.45);
+      border-bottom: 2px solid rgba(6,26,51,.45);
+      transform: rotate(-45deg);
+      border-radius: 1px;
+      flex:0 0 auto;
+    }
+    .navPanelCta{
+      padding-top: 10px;
+      border-top: 1px solid rgba(10,30,70,.08);
+      margin-top: 8px;
+    }
+    .navDrawer.open{ display:block; }
+    .navDrawer.open .navOverlay{ opacity:1; }
+    .navDrawer.open .navPanel{ transform: translateY(0); opacity:1; }
+
+    /* anchor offset for sticky header */
+    section{ scroll-margin-top: 90px; }
+
+    @media (max-width: 900px){
+      .navLinks{ display:none; }
+      .menuBtn{ display:inline-flex; }
+      .nav{ padding: 12px 0; }
+    }
+
+    /* Touch improvements */
+    @media (max-width: 768px){
+      .btn{ padding: 14px 18px; }
+      .heroActions{ gap: 10px; }
+      .heroActions .btn{ width: 100%; justify-content:center; }
+      .heroActions .btn.primary{ order: -1; }
+      input[type="range"]{ height: 28px; }
+      input[type="range"]::-webkit-slider-thumb{ height: 24px; width: 24px; }
+      input[type="range"]::-moz-range-thumb{ height: 24px; width: 24px; }
+      .flowHint{ display:none; } /* remove noisy microcopy on mobile */
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+    }
+  
+    /* ===== Floating LINE 상담 버튼 (bottom-right) ===== */
+    .lineFab{
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 80;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(11,28,44,.16);
+      background: #ffffff;
+      box-shadow: var(--shadow2);
+      font-weight: 860;
+      letter-spacing: -.01em;
+      color: var(--ink2);
+      cursor: pointer;
+      user-select: none;
+    }
+    .lineFab:hover{ transform: translateY(-2px); transition: transform .25s var(--ease); }
+    .lineFab .dot{
+      width: 10px; height: 10px;
+      border-radius: 999px;
+      background: var(--mint);
+      box-shadow: 0 0 0 6px rgba(201,162,74,.18);
+      flex: 0 0 auto;
+    }
+    @media (min-width: 980px){
+      .lineFab{ right: 28px; bottom: 28px; }
+    }
+
+</style>
+</head>
+
+<body>
+
+  <!-- Pixel Penguin Loader -->
+  <div class="loader" id="loader" aria-live="polite" aria-label="読み込み中">
+    <div class="loaderStage">
+      <div class="loadTop">
+        <div class="loadTitle">
+          <span class="mark" aria-hidden="true"></span>
+          <span>NISA はじめてのガイド</span>
+        </div>
+        <div class="loadPct"><span id="loaderPct">0</span>%</div>
+      </div>
+
+      <div class="pixelLane" aria-hidden="true">
+        <div class="stars"></div>
+        <div class="penguin" id="penguin"></div>
+        <div class="bubble" id="bubble">準備中…</div>
+        <div class="ground"></div>
+      </div>
+
+      <div class="loadBar"><div class="fill" id="bar"></div></div>
+      <div class="loadNote">ペンギンが歩いている間に、Liquid Glass とシミュレーションを準備しています。</div>
+    </div>
+  </div>
+
+  <header>
+    <div class="container">
+      <nav class="nav" aria-label="グローバルナビゲーション">
+        <a href="#top" class="brand">
+          <span class="mark" aria-hidden="true"></span>
+          <span>Start NISA</span>
+        </a>
+        <div class="navLinks">
+          <a href="#what">NISAとは</a>
+          <a href="#basics">メリット/注意点</a>
+          <a href="#funds">主要銘柄</a>
+          <a href="#steps">始め方</a>
+          <a href="#sim">シミュレーション</a>
+          <a href="#faq">FAQ</a>
+          <a href="#links">口座開設リンク</a>
+          <a class="btn primary" href="#links">今から始める</a>
+        </div>
+        <button class="menuBtn" type="button" id="openMenu" aria-label="メニューを開く" aria-controls="navDrawer" aria-expanded="false">
+          <span class="menuIcon" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer (added) -->
+  <div class="navDrawer" id="navDrawer" aria-hidden="true">
+    <div class="navOverlay" id="navOverlay" aria-hidden="true"></div>
+    <div class="navPanel" role="dialog" aria-modal="true" aria-label="メニュー">
+      <div class="navPanelHead">
+        <div class="navPanelTitle">
+          <span class="mark" aria-hidden="true"></span>
+          <span>Start NISA</span>
+        </div>
+        <button class="closeBtn" type="button" id="closeMenu" aria-label="メニューを閉じる">
+          <span class="closeX" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div class="navPanelLinks" role="navigation" aria-label="ページ内リンク">
+        <a href="#what"><span>NISAとは</span><span class="chev" aria-hidden="true"></span></a>
+        <a href="#basics"><span>メリット/注意点</span><span class="chev" aria-hidden="true"></span></a>
+        <a href="#funds"><span>主要銘柄</span><span class="chev" aria-hidden="true"></span></a>
+        <a href="#steps"><span>始め方</span><span class="chev" aria-hidden="true"></span></a>
+        <a href="#sim"><span>シミュレーション</span><span class="chev" aria-hidden="true"></span></a>
+        <a href="#faq"><span>FAQ</span><span class="chev" aria-hidden="true"></span></a>
+        <a href="#links"><span>口座開設リンク</span><span class="chev" aria-hidden="true"></span></a>
+      </div>
+
+      <div class="navPanelCta">
+        <a class="btn primary" href="#links" style="width:100%; justify-content:center;">今から始める</a>
+      </div>
+    </div>
+  </div>
+
+
+  <main id="main">
+
+    <!-- HERO -->
+    <section class="hero" id="top" data-temp="0">
+      <div class="container">
+        <div class="heroGrid">
+          <div class="parallax" data-parallax data-speed="0.25">
+            <div class="kicker"><i aria-hidden="true"></i>超入門：NISA × つみたて</div>
+            <div style="height:14px"></div>
+            <h1>むずかしいことは後。<br>先に“自動化”しよう。</h1>
+            <p class="heroLead">
+              NISAは<b>「投資で得た利益が非課税になる枠（口座）」</b>です。
+              初心者は「口座開設 → 積立設定」まで終わらせるのが最短ルート。
+            </p>
+            <div class="heroActions">
+              <a class="btn primary" href="#links">SBI / 楽天の口座開設へ</a>
+              <a class="btn" href="#steps">6ステップを見る</a>
+              <a class="btn" href="#sim">差が出る図を見る</a>
+            </div>
+            <p class="fine" style="margin-top:14px;">※ 投資には価格変動リスクがあります。本ページは一般情報であり、特定商品の勧誘・保証ではありません。</p>
+          </div>
+
+          <div class="glass heroCard parallax" data-parallax data-speed="0.18">
+            <span class="blob b1" aria-hidden="true"></span>
+            <span class="blob b2" aria-hidden="true"></span>
+            <span class="blob b3" aria-hidden="true"></span>
+
+            <div class="pill"><span class="spark" aria-hidden="true"></span>要点：NISAは「非課税の箱」</div>
+
+            <div class="stats">
+              <div class="stat"><div class="k">通常</div><div class="v">利益に約20%課税</div></div>
+              <div class="stat"><div class="k">NISA枠</div><div class="v">利益が非課税</div></div>
+              <div class="stat"><div class="k">初心者の型</div><div class="v">長期 × 分散</div></div>
+              <div class="stat"><div class="k">継続のコツ</div><div class="v">積立で自動化</div></div>
+            </div>
+
+            <p class="fine">
+              「預金より増える可能性」と「元本割れの可能性」が同居します。だからこそ、
+              <b>少額・長期・分散</b>でブレをならすのが基本戦略です。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHAT -->
+    <section id="what" data-temp="1">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="kicker"><i aria-hidden="true"></i>Step 1</div>
+          <h2>NISAとは？（まず“箱”の話だけ）</h2>
+          <p>NISAは「投資の利益が非課税になる制度」。NISA口座という<b>箱</b>を用意して、中身（投信など）を入れます。</p>
+        </div>
+
+        <div class="grid3">
+          <div class="glass card"><div class="badge"><span></span>何がうれしい？</div><h3>利益がそのまま残りやすい</h3><p style="margin-top:8px;">通常は利益に税金がかかりますが、NISA枠は非課税。長期ほど差が効きやすいです。</p></div>
+          <div class="glass card"><div class="badge"><span></span>むずかしい？</div><h3>制度は“箱”、中身は自分で選ぶ</h3><p style="margin-top:8px;">箱（NISA）を作ってから、中身（投信など）を選ぶ。順番はこれでOKです。</p></div>
+          <div class="glass card"><div class="badge"><span></span>初心者の型</div><h3>積立は“やること”が少ない</h3><p style="margin-top:8px;">毎月自動で買う＝タイミング分散。感情で売買しにくく、続けやすいのが強みです。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BASICS -->
+    <section id="basics" data-temp="2">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="kicker"><i aria-hidden="true"></i>Step 2</div>
+          <h2>メリットと注意点（ここだけ押さえる）</h2>
+          <p>“安心して続ける”ための前提。知らないとブレやすいポイントです。</p>
+        </div>
+
+        <div class="grid2">
+          <div class="glass card">
+            <div class="badge"><span></span>メリット</div>
+
+            <!-- CONTENT UPDATED ONLY (split non-tax vs compounding) -->
+            <h3>非課税のメリットが、長期で効いてくる</h3>
+            <p style="margin-top:8px;">
+              通常は利益の一部が税金として差し引かれます。NISA枠では、その差し引きがない分だけ利益が手元に残りやすくなります。
+            </p>
+            <p style="margin-top:10px;">
+              そして、手元に残った利益も含めて運用が続くと、時間の経過とともに増え方が大きくなることがあります（複利のイメージ）。
+            </p>
+
+            <ul>
+              <li>長期ほど“差”が出やすい</li>
+              <li>積立で自動化すると続けやすい</li>
+            </ul>
+          </div>
+
+          <div class="glass card">
+            <div class="badge"><span></span>注意点</div>
+            <h3>元本保証ではない（上下する）</h3>
+            <p style="margin-top:8px;">価格変動で減ることは起こります。だからこそ“余裕資金・長期・分散”が基本。</p>
+            <ul>
+              <li>生活防衛資金は確保してから</li>
+              <li>短期の上下で売らない設計にする</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FUNDS -->
+    <section id="funds" data-temp="3">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="kicker"><i aria-hidden="true"></i>Step 3</div>
+          <h2>S&P500 / オルカン等 “主要インデックス” を理解する</h2>
+          <p>初心者は「個別株」より、<b>たくさんの企業にまとめて投資</b>できるインデックス型（投信）から検討しやすいです。</p>
+        </div>
+
+        <div class="grid2">
+          <div class="glass card">
+            <div class="badge"><span></span>S&P500</div>
+            <h3>米国の代表500社に分散投資</h3>
+            <p style="margin-top:8px;">米国の主要企業（大企業中心）に投資する指標。米国中心で成長を取りにいくイメージ。</p>
+            <ul>
+              <li><b>特徴</b>：米国比率が高い</li>
+              <li><b>向き</b>：米国中心でシンプルに行きたい</li>
+              <li><b>注意</b>：米国の不調時は影響が大きめ</li>
+            </ul>
+          </div>
+
+          <div class="glass card">
+            <div class="badge"><span></span>オルカン（全世界株式）</div>
+            <h3>世界中の株式に“まるごと”分散</h3>
+            <p style="margin-top:8px;">世界の株式に広く分散する指標（代表例：MSCI ACWI等）。分散の広さが魅力。</p>
+            <ul>
+              <li><b>特徴</b>：世界に分散（米国比率は高めになりがち）</li>
+              <li><b>向き</b>：迷ったら広く分散したい</li>
+              <li><b>注意</b>：局面によっては米国集中より伸びが控えめな時も</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="height:22px"></div>
+        <div class="glass card">
+          <div class="badge"><span></span>選ぶときの3チェック</div>
+          <h3>初心者はここだけ見ればOK</h3>
+          <ul>
+            <li><b>信託報酬</b>：基本、低いほど有利になりやすい</li>
+            <li><b>分散の広さ</b>：S&P500 / 全世界 / 全米 など</li>
+            <li><b>指数への連動</b>：指数とのズレが小さいか</li>
+          </ul>
+          <p class="fine" style="margin-top:10px;">※ 実際の投信名は、証券会社の検索で「S&P500」「全世界」「オールカントリー」等で探すのが早いです。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEPS -->
+    <section id="steps" data-temp="4">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="kicker"><i aria-hidden="true"></i>Step 4</div>
+          <h2>始め方：6ステップを“流れ”で理解する</h2>
+
+          <!-- CONTENT UPDATED ONLY -->
+          <p>口座開設から積立設定までを、迷わず進められるように6つのステップに整理しました。</p>
+        </div>
+
+        <div class="glass flowWrap" id="flowWrap">
+          <div class="flowHeader">
+            <div>
+              <h3>口座開設 → 積立設定がゴール</h3>
+              <div class="flowHint">カードが浮いている位置が、いまのステップです。</div>
+            </div>
+            <div class="chip" id="flowNow"><span class="dot"></span><span>Step 1 / 6</span></div>
+          </div>
+
+          <div class="timeline" id="timeline">
+            <div class="tItem" data-title="証券会社を選ぶ">
+              <div class="node"><div class="nodeBadge">1</div></div>
+              <div class="tCard" data-step="Step 1">
+                <div class="tTop">
+                  <div class="chip"><span class="dot"></span>まずは1社</div>
+                  <div class="chip">迷ったら大手ネット証券</div>
+                </div>
+                <div class="tTitle">証券会社を選ぶ</div>
+                <p class="tText">初心者は「積立しやすいUI」「投信の選択肢」「コスト」で選べばOK。</p>
+              </div>
+            </div>
+
+            <div class="tItem" data-title="口座開設（本人確認）">
+              <div class="node"><div class="nodeBadge">2</div></div>
+              <div class="tCard" data-step="Step 2">
+                <div class="tTop">
+                  <div class="chip"><span class="dot"></span>スマホで完結</div>
+                  <div class="chip">マイナンバー</div>
+                </div>
+                <div class="tTitle">口座開設（本人確認）</div>
+                <p class="tText">総合口座＋NISA申請を同時に進めるのが最短。案内に従えばOK。</p>
+              </div>
+            </div>
+
+            <div class="tItem" data-title="積立額を決める">
+              <div class="node"><div class="nodeBadge">3</div></div>
+              <div class="tCard" data-step="Step 3">
+                <div class="tTop">
+                  <div class="chip"><span class="dot"></span>無理しない</div>
+                  <div class="chip">続けられる額</div>
+                </div>
+                <div class="tTitle">積立額を決める</div>
+                <p class="tText">最初は小さくてOK。生活防衛資金を確保したうえで“継続最優先”。</p>
+              </div>
+            </div>
+
+            <div class="tItem" data-title="銘柄を選ぶ">
+              <div class="node"><div class="nodeBadge">4</div></div>
+              <div class="tCard" data-step="Step 4">
+                <div class="tTop">
+                  <div class="chip"><span class="dot"></span>分散＋低コスト</div>
+                  <div class="chip">指数連動</div>
+                </div>
+                <div class="tTitle">銘柄を選ぶ</div>
+                <p class="tText">迷ったら「オルカン」or「S&P500」。信託報酬もチェック。</p>
+              </div>
+            </div>
+
+            <div class="tItem" data-title="積立設定（自動購入）">
+              <div class="node"><div class="nodeBadge">5</div></div>
+              <div class="tCard" data-step="Step 5">
+                <div class="tTop">
+                  <div class="chip"><span class="dot"></span>ここがゴール</div>
+                  <div class="chip">毎月自動</div>
+                </div>
+                <div class="tTitle">積立設定（自動購入）</div>
+                <p class="tText">買付日・金額・商品を設定したら勝ち。あとは淡々と続けるだけ。</p>
+              </div>
+            </div>
+
+            <div class="tItem" data-title="年1〜2回だけ見直す">
+              <div class="node"><div class="nodeBadge">6</div></div>
+              <div class="tCard" data-step="Step 6">
+                <div class="tTop">
+                  <div class="chip"><span class="dot"></span>触りすぎない</div>
+                  <div class="chip">年1〜2回</div>
+                </div>
+                <div class="tTitle">年1〜2回だけ見直す</div>
+                <p class="tText">目的や家計が変わったら調整。相場の上下で頻繁に触らない。</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIMULATION -->
+    <section id="sim" data-temp="5">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="kicker"><i aria-hidden="true"></i>Step 5</div>
+          <h2>シミュレーション：貯金だけ vs 積立投資</h2>
+          <p>
+            「ただ貯金した場合（元本の積み上げ）」と「想定利回りで積立投資した場合（複利）」を比較します。
+            <b>グラフで差が見える</b>ようにしました。
+          </p>
+        </div>
+
+        <div class="glass simWrap" id="simWrap">
+          <div class="simGrid">
+            <div class="simPanel">
+              <div class="badge"><span></span>入力</div>
+              <div class="simTitle">毎月の積立と期間を決める</div>
+
+              <div class="field">
+                <div class="fieldRow">
+                  <div class="label">毎月の積立額</div>
+                  <div class="valuePill" id="mLabel">30,000 円</div>
+                </div>
+                <input id="mRange" type="range" min="5000" max="200000" step="1000" value="30000" />
+                <div class="presetRow">
+                  <button class="miniBtn" type="button" data-target="m" data-preset="30000">3万</button>
+                  <button class="miniBtn" type="button" data-target="m" data-preset="50000">5万</button>
+                  <button class="miniBtn" type="button" data-target="m" data-preset="100000">10万</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="fieldRow">
+                  <div class="label">積立年数</div>
+                  <div class="valuePill" id="yLabel">20 年</div>
+                </div>
+                <input id="yRange" type="range" min="1" max="40" step="1" value="20" />
+                <div class="presetRow">
+                  <button class="miniBtn" type="button" data-target="y" data-preset="10">10年</button>
+                  <button class="miniBtn" type="button" data-target="y" data-preset="20">20年</button>
+                  <button class="miniBtn" type="button" data-target="y" data-preset="30">30年</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="fieldRow">
+                  <div class="label">想定年率（複利）</div>
+                  <div class="valuePill" id="rLabel">5.0 %</div>
+                </div>
+                <input id="rRange" type="range" min="0" max="10" step="0.1" value="5" />
+                <div class="presetRow">
+                  <button class="miniBtn" type="button" data-preset="3.0">控えめ 3%</button>
+                  <button class="miniBtn" type="button" data-preset="5.0">標準 5%</button>
+                  <button class="miniBtn" type="button" data-preset="7.0">強め 7%</button>
+                </div>
+              </div>
+
+              <div class="results">
+                <div class="resCard">
+                  <div class="resK">貯金だけ（最終）</div>
+                  <div class="resV" id="saveFinal">—</div>
+                </div>
+                <div class="resCard">
+                  <div class="resK">積立投資（最終）</div>
+                  <div class="resV" id="invFinal">—</div>
+                </div>
+                <div class="resCard">
+                  <div class="resK">運用収益</div>
+                  <div class="resV" id="diffFinal">—</div>
+                </div>
+                <div class="resCard">
+                  <div class="resK">積立元本（合計）</div>
+                  <div class="resV" id="principal">—</div>
+                </div>
+              </div>
+
+              <p class="fine" style="margin-top:14px;">
+                ※ 想定年率は将来の成果を保証しません。投資は価格変動で元本割れの可能性があります。
+              </p>
+            </div>
+
+            <div class="chartWrap">
+              <div class="chartHead">
+                <div>
+                  <div class="badge" style="margin-bottom:10px;"><span></span>グラフ</div>
+                  <div class="simTitle" style="margin:0;">時間とともに差が開く</div>
+                  <p class="fine" style="margin-top:10px;">横軸：経過年数 / 縦軸：資産額（円）</p>
+                </div>
+                <div class="legend" aria-label="凡例">
+                  <span class="legItem"><span class="swatch sw1"></span>貯金（元本）</span>
+                  <span class="legItem"><span class="swatch sw2"></span>積立投資（複利）</span>
+                </div>
+              </div>
+              <canvas id="chart" width="1200" height="700" aria-label="資産推移グラフ"></canvas>
+              <p class="fine" style="margin-top:12px;">
+                目安：同じ積立でも、長期になるほど複利の影響が出やすいです（ただし上下変動はあります）。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" data-temp="6">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="kicker"><i aria-hidden="true"></i>FAQ</div>
+          <h2>よくある質問</h2>
+          <p>初心者が不安になりがちなポイントだけ、短く。</p>
+        </div>
+
+        <div class="faqWrap" id="faqWrap">
+          <div class="faqItem">
+            <button class="faqBtn" type="button" aria-expanded="false">
+              <span class="faqQ">いくらから始めればいい？</span>
+              <span class="faqIcon" aria-hidden="true">＋</span>
+            </button>
+            <div class="faqBody" role="region" aria-hidden="true">
+              <div class="faqInner">
+                「続けられる額」からでOK。最初は小さく始めて、慣れたら増やすのが安全です。
+                まずは生活防衛資金を確保してから。
+              </div>
+            </div>
+          </div>
+
+          <div class="faqItem">
+            <button class="faqBtn" type="button" aria-expanded="false">
+              <span class="faqQ">暴落したらどうする？</span>
+              <span class="faqIcon" aria-hidden="true">＋</span>
+            </button>
+            <div class="faqBody" role="region" aria-hidden="true">
+              <div class="faqInner">
+                積立は買うタイミングを分散します。短期の上下は前提。
+                無理のない金額で続ける設計が重要です（不安で眠れない額は大きすぎ）。
+              </div>
+            </div>
+          </div>
+
+          <div class="faqItem">
+            <button class="faqBtn" type="button" aria-expanded="false">
+              <span class="faqQ">オルカンとS&P500、どっち？</span>
+              <span class="faqIcon" aria-hidden="true">＋</span>
+            </button>
+            <div class="faqBody" role="region" aria-hidden="true">
+              <div class="faqInner">
+                迷うなら分散が広い「オルカン」。米国中心でシンプルに行くなら「S&P500」。
+                どちらも“長期・分散・低コスト”の考え方に沿います。
+              </div>
+            </div>
+          </div>
+
+          <div class="faqItem">
+            <button class="faqBtn" type="button" aria-expanded="false">
+              <span class="faqQ">低コストって、どこを見れば分かる？</span>
+              <span class="faqIcon" aria-hidden="true">＋</span>
+            </button>
+            <div class="faqBody" role="region" aria-hidden="true">
+              <div class="faqInner">
+                投資信託の詳細画面にある「信託報酬」をチェックします。
+                同じ指数に連動する商品なら、信託報酬の差が効きやすいです。
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LINKS -->
+    <section id="links" data-temp="7">
+      <div class="container">
+        <div class="sectionHead">
+          <div class="kicker"><i aria-hidden="true"></i>Step 6</div>
+          <h2>SBI証券 / 楽天証券 口座開設リンク（公式）</h2>
+          <p>次は「口座開設 → 積立設定」へ。リンクは公式サイトです。</p>
+        </div>
+
+        <div class="grid2">
+          <div class="glass card">
+            <div class="badge"><span></span>SBI証券</div>
+            <h3>口座開設</h3>
+            <p style="margin-top:8px;">総合口座の開設フロー（NISA同時申込の案内が含まれます）。</p>
+            <div style="height:14px"></div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <a class="btn primary" href="https://go.sbisec.co.jp/account/sogoflow_01.html?id=id01" target="_blank" rel="noopener">SBIで口座開設へ</a>
+              <a class="btn" href="https://www.sbisec.co.jp/visitor/nisa/flow" target="_blank" rel="noopener">SBIのNISA案内</a>
+            </div>
+          </div>
+
+          <div class="glass card">
+            <div class="badge"><span></span>楽天証券</div>
+            <h3>口座開設</h3>
+            <p style="margin-top:8px;">総合口座の申込みページ（NISA案内ページも合わせて参照できます）。</p>
+            <div style="height:14px"></div>
+            <div style="display:flex; gap:10px; flex-wrap:nowrap;">
+              <a class="btn primary" href="https://www.rakuten-sec.co.jp/web/account/" target="_blank" rel="noopener" style="flex:1; justify-content:center;">楽天で口座開設へ</a>
+              <a class="btn" href="https://www.rakuten-sec.co.jp/web/nisa/startup/" target="_blank" rel="noopener" style="flex:1; justify-content:center;">楽天のNISA案内</a>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:22px"></div>
+        <div class="glass card">
+          <div class="badge"><span></span>最短の進め方</div>
+          <h3>ここまでやれば“完了”</h3>
+          <ul>
+            <li>口座開設（本人確認）</li>
+            <li>NISA枠の申込み（画面の案内に従う）</li>
+            <li>投信を1つ選ぶ（オルカン or S&P500 など）</li>
+            <li>積立設定（毎月◯円）</li>
+            <li>あとは年1〜2回の見直しだけ</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <div class="foot">
+          <div>© <span id="year"></span> Start NISA.</div>
+          <div>※ 本ページは一般情報。相場・制度は変更される可能性があります。</div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Smooth scroll
+    document.documentElement.style.scrollBehavior = "smooth";
+
+    // ===== Background temperature per section =====
+    const tempStops = [
+      {a:"rgba(255,255,255,1)", b:"rgba(246,249,255,1)", g1:"rgba(145,214,255,.26)", g2:"rgba(11,28,44,.12)"},
+      {a:"rgba(255,255,255,1)", b:"rgba(245,250,255,1)", g1:"rgba(145,214,255,.22)", g2:"rgba(11,28,44,.10)"},
+      {a:"rgba(255,255,255,1)", b:"rgba(244,249,255,1)", g1:"rgba(145,214,255,.20)", g2:"rgba(11,28,44,.12)"},
+      {a:"rgba(255,255,255,1)", b:"rgba(243,249,255,1)", g1:"rgba(145,214,255,.22)", g2:"rgba(11,28,44,.14)"},
+      {a:"rgba(255,255,255,1)", b:"rgba(242,248,255,1)", g1:"rgba(145,214,255,.26)", g2:"rgba(11,28,44,.12)"},
+      {a:"rgba(255,255,255,1)", b:"rgba(243,249,255,1)", g1:"rgba(145,214,255,.24)", g2:"rgba(11,28,44,.10)"},
+      {a:"rgba(255,255,255,1)", b:"rgba(244,250,255,1)", g1:"rgba(145,214,255,.20)", g2:"rgba(11,28,44,.12)"},
+      {a:"rgba(255,255,255,1)", b:"rgba(245,250,255,1)", g1:"rgba(145,214,255,.22)", g2:"rgba(11,28,44,.12)"},
+    ];
+    const sections = [...document.querySelectorAll("section[data-temp]")];
+
+    function applyTemperature(){
+      const mid = window.innerHeight * 0.52;
+      let best = 0, bestDist = Infinity;
+      sections.forEach((s) => {
+        const r = s.getBoundingClientRect();
+        const c = r.top + r.height*0.25;
+        const d = Math.abs(c - mid);
+        if(d < bestDist){
+          bestDist = d;
+          best = Number(s.dataset.temp || 0);
+        }
+      });
+      const t = tempStops[Math.min(tempStops.length-1, Math.max(0, Math.floor(best)))];
+      document.documentElement.style.setProperty("--bgA", t.a);
+      document.documentElement.style.setProperty("--bgB", t.b);
+      document.documentElement.style.setProperty("--bgGlow1", t.g1);
+      document.documentElement.style.setProperty("--bgGlow2", t.g2);
+    }
+
+    // ===== Pointer parallax (hero blobs) =====
+    const blobs = document.querySelectorAll(".blob");
+    window.addEventListener("pointermove", (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5);
+      const y = (e.clientY / window.innerHeight - 0.5);
+      blobs.forEach((b, i) => {
+        const k = (i + 1) * 12;
+        b.style.transform = `translate(${x * k}px, ${y * k}px)`;
+      });
+    });
+
+    // ===== Scroll parallax (subtle) =====
+    const parallaxEls = [...document.querySelectorAll("[data-parallax]")];
+    function applyParallax(){
+      const y = window.scrollY;
+      parallaxEls.forEach(el => {
+        const speed = Number(el.dataset.speed || 0.15);
+        const rect = el.getBoundingClientRect();
+        const top = rect.top + y;
+        const prog = (y + window.innerHeight*0.55 - top) / (window.innerHeight*1.25);
+        const t = Math.min(1.3, Math.max(-0.7, prog));
+        const dy = (-t * 26 * speed);
+        const blur = Math.max(0, (t - 0.25)) * 1.6;
+        el.style.transform = `translate3d(0, ${dy.toFixed(2)}px, 0)`;
+        el.style.filter = `blur(${blur.toFixed(2)}px)`;
+      });
+    }
+
+    // ===== Flow timeline highlight =====
+    const timeline = document.getElementById("timeline");
+    const items = timeline ? [...timeline.querySelectorAll(".tItem")] : [];
+    const flowNow = document.getElementById("flowNow");
+
+    function updateTimeline(){
+      if(!timeline) return;
+      const mid = window.innerHeight * 0.52;
+      let best = 0, bestDist = Infinity;
+      items.forEach((it, i) => {
+        const r = it.getBoundingClientRect();
+        const c = r.top + r.height*0.5;
+        const d = Math.abs(c - mid);
+        if(d < bestDist){ bestDist = d; best = i; }
+      });
+
+      items.forEach((it, i) => it.classList.toggle("active", i === best));
+      if(flowNow){
+        const title = items[best]?.dataset.title || "";
+        flowNow.innerHTML = `<span class="dot"></span><span>Step ${best+1} / ${items.length} — ${title}</span>`;
+      }
+    }
+
+    // ===== FAQ accordion =====
+    function initFaq(){
+      const wrap = document.getElementById("faqWrap");
+      if(!wrap) return;
+      const faqItems = [...wrap.querySelectorAll(".faqItem")];
+
+      function closeItem(item){
+        const btn = item.querySelector(".faqBtn");
+        const body = item.querySelector(".faqBody");
+        btn.setAttribute("aria-expanded", "false");
+        body.setAttribute("aria-hidden", "true");
+        body.style.height = "0px";
+        item.classList.remove("open");
+      }
+      function openItem(item){
+        const btn = item.querySelector(".faqBtn");
+        const body = item.querySelector(".faqBody");
+        const inner = item.querySelector(".faqInner");
+        btn.setAttribute("aria-expanded", "true");
+        body.setAttribute("aria-hidden", "false");
+        body.style.height = inner.scrollHeight + "px";
+        item.classList.add("open");
+      }
+
+      faqItems.forEach(closeItem);
+
+      wrap.addEventListener("click", (e) => {
+        const btn = e.target.closest(".faqBtn");
+        if(!btn) return;
+        const item = btn.closest(".faqItem");
+        const isOpen = item.classList.contains("open");
+        faqItems.forEach(it => { if(it !== item) closeItem(it); });
+        if(isOpen) closeItem(item);
+        else openItem(item);
+      });
+
+      window.addEventListener("resize", () => {
+        faqItems.forEach(item => {
+          if(item.classList.contains("open")){
+            const body = item.querySelector(".faqBody");
+            const inner = item.querySelector(".faqInner");
+            body.style.height = inner.scrollHeight + "px";
+          }
+        });
+      });
+    }
+
+    // ===== Pixel Penguin SVG frames (SUICA-like vibe, not an exact copy) =====
+    const pg1 = encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" shape-rendering="crispEdges">
+        <rect width="72" height="72" fill="none"/>
+        <rect x="20" y="10" width="32" height="10" fill="#0b1324"/>
+        <rect x="16" y="18" width="40" height="34" fill="#0b1324"/>
+        <rect x="18" y="14" width="36" height="44" fill="#0b1324"/>
+        <rect x="24" y="20" width="24" height="34" fill="#ffffff"/>
+        <rect x="24" y="20" width="24" height="7" fill="#eef5ff"/>
+        <rect x="22" y="28" width="28" height="20" fill="#ffffff"/>
+        <rect x="28" y="18" width="4" height="4" fill="#0b1324"/>
+        <rect x="40" y="18" width="4" height="4" fill="#0b1324"/>
+        <rect x="33" y="24" width="6" height="4" fill="#ffbf3c"/>
+        <rect x="34" y="28" width="4" height="2" fill="#ffbf3c"/>
+        <rect x="14" y="26" width="4" height="16" fill="#0b1324"/>
+        <rect x="54" y="26" width="4" height="16" fill="#0b1324"/>
+        <rect x="24" y="56" width="12" height="6" fill="#ffbf3c"/>
+        <rect x="36" y="56" width="12" height="6" fill="#ffbf3c"/>
+        <rect x="22" y="60" width="16" height="4" fill="#ffbf3c"/>
+        <rect x="36" y="60" width="16" height="4" fill="#ffbf3c"/>
+      </svg>
+    `);
+    const pg2 = encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" shape-rendering="crispEdges">
+        <rect width="72" height="72" fill="none"/>
+        <rect x="20" y="10" width="32" height="10" fill="#0b1324"/>
+        <rect x="16" y="18" width="40" height="34" fill="#0b1324"/>
+        <rect x="18" y="14" width="36" height="44" fill="#0b1324"/>
+        <rect x="24" y="20" width="24" height="34" fill="#ffffff"/>
+        <rect x="24" y="20" width="24" height="7" fill="#eef5ff"/>
+        <rect x="22" y="28" width="28" height="20" fill="#ffffff"/>
+        <rect x="28" y="18" width="4" height="4" fill="#0b1324"/>
+        <rect x="40" y="18" width="4" height="4" fill="#0b1324"/>
+        <rect x="33" y="24" width="6" height="4" fill="#ffbf3c"/>
+        <rect x="34" y="28" width="4" height="2" fill="#ffbf3c"/>
+        <rect x="14" y="26" width="4" height="16" fill="#0b1324"/>
+        <rect x="54" y="26" width="4" height="16" fill="#0b1324"/>
+        <rect x="24" y="56" width="12" height="6" fill="#ffbf3c"/>
+        <rect x="36" y="56" width="12" height="6" fill="#ffbf3c"/>
+        <rect x="20" y="60" width="16" height="4" fill="#ffbf3c"/>
+        <rect x="38" y="60" width="16" height="4" fill="#ffbf3c"/>
+      </svg>
+    `);
+    document.documentElement.style.setProperty("--pg1", `url("data:image/svg+xml,${pg1}")`);
+    document.documentElement.style.setProperty("--pg2", `url("data:image/svg+xml,${pg2}")`);
+
+    // ===== LINE CTA (floating) =====
+    // あなたの個人アカウントへのリンクに差し替えてください（例： https://line.me/R/ti/p/~YOUR_LINE_ID ）
+    const LINE_CHAT_URL = "";
+    // ↑ここに貼るのが不安なら、上のボタンhref（https://line.me/...）を書き換えるだけでもOKです。
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const lineFab = document.getElementById("lineFab");
+      if(!lineFab) return;
+
+      // JS側のURLが空なら、HTML側のhrefを使う（JSエラー時でも最低限動くように）
+      const hrefUrl = lineFab.getAttribute("href") || "";
+      const finalLineUrl = (LINE_CHAT_URL || hrefUrl).trim();
+
+      // URLが設定されている場合は href もセット（JSが無効でも遷移できるように）
+      if(finalLineUrl && !finalLineUrl.includes("YOUR_LINE_ID")){
+        lineFab.setAttribute("href", finalLineUrl);
+        lineFab.setAttribute("target", "_blank");
+        lineFab.setAttribute("rel", "noopener noreferrer");
+      }
+
+      lineFab.addEventListener("click", (e) => {
+        // href="#" のままでもトップに戻らないように抑止
+        e.preventDefault();
+        if(!finalLineUrl || finalLineUrl.includes("YOUR_LINE_ID")){
+          alert("LINEリンク（個人アカウント）を設定してください。HTML内の LINE_CHAT_URL をご自身のURLに差し替えるだけでOKです。");
+          return;
+        }
+        window.open(finalLineUrl, "_blank", "noopener,noreferrer");
+      });
+    });
+
+    // ===== Loader progress =====
+
+    const loader = document.getElementById("loader");
+    const bar = document.getElementById("bar");
+    const pct = document.getElementById("loaderPct");
+    const bubble = document.getElementById("bubble");
+    const bubbleTexts = ["準備中…", "余白を整形…", "ガラスを流動化…", "グラフを描画…", "あと少し…"];
+    let bi = 0;
+
+    let p = 0;
+    const tick = () => {
+      p = Math.min(100, p + (p < 60 ? 11 : p < 88 ? 6 : 3) + Math.random() * 2);
+      bar.style.width = p + "%";
+      pct.textContent = String(Math.round(p));
+      if (p > (bi+1) * 20 && bi < bubbleTexts.length-1) {
+        bi++;
+        bubble.textContent = bubbleTexts[bi];
+      }
+      if (p >= 100) setTimeout(() => loader.classList.add("hidden"), 240);
+      else setTimeout(tick, 220);
+    };
+
+    // ===== Simulation logic =====
+    const mRange = document.getElementById("mRange");
+    const yRange = document.getElementById("yRange");
+    const rRange = document.getElementById("rRange");
+    const mLabel = document.getElementById("mLabel");
+    const yLabel = document.getElementById("yLabel");
+    const rLabel = document.getElementById("rLabel");
+
+    const saveFinalEl = document.getElementById("saveFinal");
+    const invFinalEl = document.getElementById("invFinal");
+    const diffFinalEl = document.getElementById("diffFinal");
+    const principalEl = document.getElementById("principal");
+
+    const canvas = document.getElementById("chart");
+    const ctx = canvas.getContext("2d");
+
+    const formatJPY = (n) => {
+      const v = Math.round(n);
+      return v.toLocaleString("ja-JP") + " 円";
+    };
+
+    function monthlyRateFromAnnual(annualPct){
+      const a = annualPct / 100;
+      return Math.pow(1 + a, 1/12) - 1;
+    }
+
+    function calcSeries(monthly, years, annualPct){
+      const months = years * 12;
+      const r = monthlyRateFromAnnual(annualPct);
+      let save = 0;
+      let inv = 0;
+
+      const S = new Array(months + 1);
+      const I = new Array(months + 1);
+      S[0] = 0; I[0] = 0;
+
+      for(let t=1; t<=months; t++){
+        save += monthly;
+        inv = inv * (1 + r) + monthly;
+        S[t] = save;
+        I[t] = inv;
+      }
+      return {months, S, I, r};
+    }
+
+    // animated draw state
+    let anim = {fromS:[], fromI:[], toS:[], toI:[], t:1};
+    function lerp(a,b,t){ return a + (b-a)*t; }
+    function easeOut(t){ return 1 - Math.pow(1-t, 3); }
+
+    function resizeCanvas(){
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(320, rect.width);
+      const h = rect.height;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function drawChart(S, I, years){
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      const pad = 28;
+      const topPad = 78; // reserve space for the diff box so it won't overlap the lines
+      const left = pad;
+      const right = w - pad;
+      const top = topPad;
+      const bottom = h - pad;
+
+      const maxV = Math.max(S[S.length-1], I[I.length-1]) * 1.08;
+      const minV = 0;
+
+      function xAt(idx){
+        const t = idx / (S.length - 1);
+        return left + (right-left)*t;
+      }
+      function yAt(v){
+        const t = (v - minV) / (maxV - minV);
+        return bottom - (bottom-top)*t;
+      }
+
+      // clear
+      ctx.clearRect(0,0,w,h);
+
+      // grid
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(6,26,51,.10)";
+      const gridN = 4;
+      for(let i=0; i<=gridN; i++){
+        const yy = top + (bottom-top)*(i/gridN);
+        ctx.beginPath();
+        ctx.moveTo(left, yy);
+        ctx.lineTo(right, yy);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // axes labels (simple, minimal)
+      ctx.save();
+      ctx.fillStyle = "rgba(6,26,51,.62)";
+      ctx.font = "12px -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+
+      // y-axis: show in millions of yen to reduce digits (百万円)
+      const yTicks = 4;
+      for(let i=0; i<=yTicks; i++){
+        const v = maxV * (1 - i/yTicks);
+        const yy = yAt(v);
+        const mv = v / 1_000_000; // million JPY
+        const label = (mv >= 10 ? Math.round(mv).toString() : mv.toFixed(1)) + " 百万円";
+        ctx.fillText(label, left, yy - 6);
+      }
+      ctx.restore();
+
+      // unit hint (top-left)
+      ctx.save();
+      ctx.fillStyle = "rgba(6,26,51,.45)";
+      ctx.font = "11px -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+      ctx.fillText("縦軸：百万円", left, top - 14);
+      ctx.restore();
+
+      // lines
+      function strokeLine(arr, stroke, width, glow){
+        ctx.save();
+        ctx.lineWidth = width;
+        ctx.strokeStyle = stroke;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        if(glow){
+          ctx.shadowColor = "rgba(11,28,44,.25)";
+          ctx.shadowBlur = 18;
+        }
+        ctx.beginPath();
+        for(let i=0; i<arr.length; i++){
+          const x = xAt(i);
+          const y = yAt(arr[i]);
+          if(i===0) ctx.moveTo(x,y);
+          else ctx.lineTo(x,y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // savings (muted)
+      strokeLine(S, "rgba(6,26,51,.38)", 3, false);
+      // investing (blue gradient-ish by drawing twice)
+      strokeLine(I, "rgba(11,28,44,.55)", 5, true);
+      strokeLine(I, "rgba(145,214,255,.70)", 2.6, false);
+
+      // end dots
+      function endDot(arr, fill){
+        const x = xAt(arr.length-1);
+        const y = yAt(arr[arr.length-1]);
+        ctx.save();
+        ctx.fillStyle = fill;
+        ctx.beginPath();
+        ctx.arc(x, y, 5.5, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+      }
+      endDot(S, "rgba(6,26,51,.50)");
+      endDot(I, "rgba(11,28,44,.85)");
+
+      // small callout for diff
+      const diff = I[I.length-1] - S[S.length-1];
+      ctx.save();
+      ctx.fillStyle = "rgba(255,255,255,.74)";
+      ctx.strokeStyle = "rgba(255,255,255,.85)";
+      ctx.lineWidth = 1;
+      const boxW = Math.min(320, w - 2*pad);
+      const boxH = 44;
+      const bx = right - boxW;
+      const by = pad;
+      ctx.beginPath();
+      roundRect(ctx, bx, by, boxW, boxH, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(6,26,51,.82)";
+      ctx.font = "12px -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+      ctx.fillText("運用収益", bx + 14, by + 17);
+      ctx.font = "bold 14px -apple-system, BlinkMacSystemFont, system-ui, sans-serif";
+      ctx.fillText(formatJPY(diff), bx + 14, by + 35);
+      ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, w, h, r){
+      const rr = Math.min(r, w/2, h/2);
+      ctx.moveTo(x+rr, y);
+      ctx.arcTo(x+w, y, x+w, y+h, rr);
+      ctx.arcTo(x+w, y+h, x, y+h, rr);
+      ctx.arcTo(x, y+h, x, y, rr);
+      ctx.arcTo(x, y, x+w, y, rr);
+      ctx.closePath();
+    }
+
+    function updateSim(animate=true){
+      const monthly = Number(mRange.value);
+      const years = Number(yRange.value);
+      const annual = Number(rRange.value);
+
+      mLabel.textContent = monthly.toLocaleString("ja-JP") + " 円";
+      yLabel.textContent = years + " 年";
+      rLabel.textContent = annual.toFixed(1) + " %";
+
+      const {S, I} = calcSeries(monthly, years, annual);
+      const saveF = S[S.length-1];
+      const invF = I[I.length-1];
+      const diffF = invF - saveF;
+      const principal = monthly * years * 12;
+
+      saveFinalEl.textContent = formatJPY(saveF);
+      invFinalEl.textContent = formatJPY(invF);
+      diffFinalEl.textContent = formatJPY(diffF);
+      principalEl.textContent = formatJPY(principal);
+
+      if(!animate){
+        drawChart(S, I, years);
+        return;
+      }
+
+      // animate between previous series and new series
+      const prevS = (anim.toS && anim.toS.length) ? anim.toS : S;
+      const prevI = (anim.toI && anim.toI.length) ? anim.toI : I;
+
+      anim = {
+        fromS: prevS.slice(),
+        fromI: prevI.slice(),
+        toS: S.slice(),
+        toI: I.slice(),
+        t: 0
+      };
+
+      const maxLen = Math.max(anim.fromS.length, anim.toS.length);
+      const resample = (arr, n) => {
+        if(arr.length === n) return arr;
+        const out = new Array(n);
+        for(let i=0; i<n; i++){
+          const t = i/(n-1);
+          const idx = t*(arr.length-1);
+          const j = Math.floor(idx);
+          const k = Math.min(arr.length-1, j+1);
+          const f = idx - j;
+          out[i] = lerp(arr[j], arr[k], f);
+        }
+        return out;
+      };
+
+      anim.fromS = resample(anim.fromS, maxLen);
+      anim.fromI = resample(anim.fromI, maxLen);
+      anim.toS   = resample(anim.toS,   maxLen);
+      anim.toI   = resample(anim.toI,   maxLen);
+
+      const start = performance.now();
+      const dur = 520;
+
+      function step(now){
+        const t = Math.min(1, (now - start)/dur);
+        const e = easeOut(t);
+        const curS = anim.fromS.map((v,i)=> lerp(v, anim.toS[i], e));
+        const curI = anim.fromI.map((v,i)=> lerp(v, anim.toI[i], e));
+        drawChart(curS, curI, years);
+        if(t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    // ===== Presets =====
+    document.querySelectorAll("[data-preset]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const v = btn.dataset.preset;
+        const t = btn.dataset.target;
+        if(t === "m"){
+          mRange.value = v;
+        }else if(t === "y"){
+          yRange.value = v;
+        }else{
+          rRange.value = v;
+        }
+        updateSim(true);
+      });
+    });
+
+    // ===== Debounce input =====
+    let simTimer = null;
+    function onSimChange(){
+      clearTimeout(simTimer);
+      simTimer = setTimeout(()=> updateSim(true), 35);
+    }
+    mRange.addEventListener("input", onSimChange);
+    yRange.addEventListener("input", onSimChange);
+    rRange.addEventListener("input", onSimChange);
+
+    // ===== Update all on scroll =====
+    function updateAll(){
+      applyParallax();
+      applyTemperature();
+      updateTimeline();
+    }
+    window.addEventListener("scroll", () => requestAnimationFrame(updateAll), { passive:true });
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      updateSim(false);
+      requestAnimationFrame(updateAll);
+    });
+
+    window.addEventListener("load", () => {
+      document.getElementById("year").textContent = new Date().getFullYear();
+      initFaq();
+      resizeCanvas();
+      updateSim(false);
+      tick();
+      updateAll();
+    });
+  </script>
+
+  <script>
+    // ===== Mobile menu (added) =====
+    (function(){
+      const openBtn = document.getElementById('openMenu');
+      const drawer = document.getElementById('navDrawer');
+      const overlay = document.getElementById('navOverlay');
+      const closeBtn = document.getElementById('closeMenu');
+
+      if(!openBtn || !drawer || !overlay || !closeBtn) return;
+
+      const focusableSel = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      let lastFocus = null;
+
+      function openMenu(){
+        lastFocus = document.activeElement;
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden','false');
+        openBtn.setAttribute('aria-expanded','true');
+        document.body.style.overflow = 'hidden';
+        // focus first link
+        const first = drawer.querySelector(focusableSel);
+        first && first.focus();
+      }
+      function closeMenu(){
+        drawer.classList.remove('open');
+        drawer.setAttribute('aria-hidden','true');
+        openBtn.setAttribute('aria-expanded','false');
+        document.body.style.overflow = '';
+        lastFocus && lastFocus.focus();
+      }
+
+      openBtn.addEventListener('click', openMenu);
+      closeBtn.addEventListener('click', closeMenu);
+      overlay.addEventListener('click', closeMenu);
+
+      // close on link click
+      drawer.addEventListener('click', (e)=>{
+        const a = e.target.closest('a[href^="#"]');
+        if(a) closeMenu();
+      });
+
+      // escape to close + basic focus trap
+      document.addEventListener('keydown', (e)=>{
+        if(!drawer.classList.contains('open')) return;
+        if(e.key === 'Escape'){ e.preventDefault(); closeMenu(); return; }
+        if(e.key !== 'Tab') return;
+
+        const focusables = Array.from(drawer.querySelectorAll(focusableSel)).filter(el=>el.offsetParent !== null);
+        if(!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+        else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+      });
+    })();
+  </script>
+
+
+  <!-- Floating LINE button -->
+  <a class="lineFab" id="lineFab" href="https://line.me/R/ti/p/~3861569" aria-label="LINEで無料相談">
+    <span class="dot" aria-hidden="true"></span>
+    LINEで無料相談
+  </a>
+
+</body>
+</html>
