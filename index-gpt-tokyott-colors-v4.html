@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
   <meta name="description" content="NISAをゼロから理解し、主要インデックス（S&P500/オルカン等）と始め方、積立シミュレーションまで。" />
   <title>NISA UNLEASHED | ガイド</title>
   
@@ -45,7 +45,8 @@
       color: var(--ink);
       background-color: var(--bg);
       font-family: var(--font-body);
-      overflow-x:hidden;
+      overflow-x:hidden; /* Prevent horizontal scroll */
+      width: 100%;
       /* Dot grid background */
       background-image: radial-gradient(var(--ink) 1px, transparent 1px);
       background-size: 24px 24px;
@@ -54,15 +55,15 @@
     a{ color:inherit; text-decoration:none; }
     
     /* Typography Overrides */
-    h1, h2, h3{ font-family: var(--font-head); text-transform: uppercase; line-height: 0.9; color: var(--ink); }
-    h1{ font-size: clamp(48px, 11vw, 120px); letter-spacing: -0.04em; margin: 0 0 20px 0; }
-    h2{ font-size: clamp(32px, 5vw, 48px); letter-spacing: -0.02em; margin: 0 0 16px 0; background: var(--ink); color: var(--paper); display: inline-block; padding: 4px 12px; transform: rotate(-1deg); }
-    h3{ font-size: 24px; margin: 0 0 10px 0; }
+    h1, h2, h3{ font-family: var(--font-head); text-transform: uppercase; line-height: 0.95; color: var(--ink); word-break: break-word; }
+    h1{ font-size: clamp(40px, 11vw, 120px); letter-spacing: -0.04em; margin: 0 0 20px 0; }
+    h2{ font-size: clamp(28px, 5vw, 48px); letter-spacing: -0.02em; margin: 0 0 16px 0; background: var(--ink); color: var(--paper); display: inline-block; padding: 4px 12px; transform: rotate(-1deg); }
+    h3{ font-size: clamp(20px, 4vw, 24px); margin: 0 0 10px 0; }
     p{ font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.2rem; font-weight: 500; }
     ul{ margin: 16px 0; padding-left: 24px; font-weight: 700; }
     li{ margin-bottom: 8px; }
 
-    .container{ width: min(var(--max), 94vw); margin:0 auto; position: relative; z-index: 2; }
+    .container{ width: min(var(--max), 92vw); margin:0 auto; position: relative; z-index: 2; }
 
     /* =========================
        NEO-BRUTALISM COMPONENTS
@@ -76,14 +77,15 @@
       padding: var(--pad);
       transition: transform 0.1s linear, box-shadow 0.1s linear;
       position: relative;
+      color: var(--ink); /* Ensure text is black by default inside cards */
     }
     .b-card:hover{
       transform: translate(-2px, -2px);
       box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px var(--ink);
     }
-    .b-card.accent-lime{ background: var(--accent-lime); }
-    .b-card.accent-cyan{ background: var(--accent-cyan); }
-    .b-card.accent-pink{ background: var(--accent-pink); }
+    .b-card.accent-lime{ background: var(--accent-lime); color: var(--ink); }
+    .b-card.accent-cyan{ background: var(--accent-cyan); color: var(--ink); }
+    .b-card.accent-pink{ background: var(--accent-pink); color: var(--ink); }
 
     /* Brutal Button */
     .btn{
@@ -101,6 +103,7 @@
       transition: all 0.1s;
       user-select: none;
       text-decoration: none;
+      text-align: center;
     }
     .btn:hover{
       transform: translate(2px, 2px);
@@ -143,8 +146,8 @@
       padding: 12px 0;
     }
     .nav{ display: flex; justify-content: space-between; align-items: center; }
-    .brand{ font-family: var(--font-head); font-size: 24px; display: flex; align-items: center; gap: 8px; }
-    .brand .mark{ width: 24px; height: 24px; background: var(--accent-lime); border: 2px solid var(--ink); }
+    .brand{ font-family: var(--font-head); font-size: clamp(20px, 5vw, 24px); display: flex; align-items: center; gap: 8px; }
+    .brand .mark{ width: 24px; height: 24px; background: var(--accent-lime); border: 2px solid var(--ink); flex-shrink: 0; }
     
     .navLinks{ display: flex; gap: 16px; align-items: center; }
     .navLinks a{
@@ -170,12 +173,14 @@
       transform: rotate(-2deg) scale(1.05);
       margin: 40px 0;
       z-index: 1; position: relative;
+      width: 105vw; /* Ensure it covers rotation */
+      margin-left: -2.5vw;
     }
     .marquee-content {
       display: inline-block;
-      animation: marquee 20s linear infinite;
+      animation: marquee 30s linear infinite; /* Slower for readability */
       font-family: var(--font-head);
-      font-size: 40px;
+      font-size: clamp(24px, 5vw, 40px);
       color: var(--ink);
       text-transform: uppercase;
     }
@@ -185,8 +190,8 @@
     }
 
     /* ===== Hero (Updated) ===== */
-    .hero{ padding: 80px 0; position: relative; overflow: hidden; }
-    .heroGrid{ display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 60px; align-items: center; }
+    .hero{ padding: 60px 0; position: relative; overflow: hidden; }
+    .heroGrid{ display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(30px, 5vw, 60px); align-items: center; }
     
     /* New Hero Typography */
     .hero-type-block { position: relative; z-index: 2; }
@@ -199,37 +204,41 @@
     }
     
     .giant-text {
-      font-size: clamp(60px, 11vw, 130px);
-      line-height: 0.85;
+      font-size: clamp(48px, 12vw, 130px); /* Better minimum size for mobile */
+      line-height: 0.9;
       letter-spacing: -0.05em;
       text-transform: uppercase;
       margin-bottom: 24px;
+      word-wrap: break-word;
     }
     .giant-text span { display: block; }
     .giant-text .highlight {
       color: var(--accent-pink);
-      text-shadow: 4px 4px 0 var(--ink);
+      text-shadow: 3px 3px 0 var(--ink);
+      display: inline-block; /* Prevent layout break on mobile */
     }
     
     .heroLead{ 
-      font-size: 1.25rem; font-weight: 700; max-width: 90%; 
+      font-size: clamp(1rem, 4vw, 1.25rem); font-weight: 700; max-width: 95%; 
       background: var(--paper); border-left: 6px solid var(--accent-lime); 
-      padding: 16px 24px; margin-bottom: 32px; 
+      padding: 16px 20px; margin-bottom: 32px; 
     }
     
     .heroActions{ display: flex; flex-wrap: wrap; gap: 16px; }
+    .heroActions .btn { flex: 1 1 auto; min-width: 140px; }
 
     /* Hero Visual - Abstract Shapes */
     .hero-visual{
-      position: relative; height: 500px;
+      position: relative; height: clamp(300px, 50vw, 500px);
       border: var(--border-width) solid var(--ink);
       background: var(--ink); /* Inverted for impact */
-      box-shadow: 16px 16px 0 var(--accent-cyan);
+      box-shadow: clamp(8px, 2vw, 16px) clamp(8px, 2vw, 16px) 0 var(--accent-cyan);
       display: grid; place-items: center;
       overflow: hidden;
+      width: 100%;
     }
     .shape-circle{
-      width: 200px; height: 200px; border-radius: 50%;
+      width: clamp(150px, 30vw, 200px); height: clamp(150px, 30vw, 200px); border-radius: 50%;
       background: var(--accent-pink); border: 3px solid var(--ink);
       position: absolute; top: -20px; right: -20px;
       animation: float 4s ease-in-out infinite;
@@ -249,14 +258,15 @@
     }
     
     .hero-stat-box{
-      background: var(--paper); border: 3px solid var(--ink); padding: 30px;
-      box-shadow: 12px 12px 0 var(--accent-yellow);
+      background: var(--paper); border: 3px solid var(--ink); padding: 20px 30px;
+      box-shadow: 8px 8px 0 var(--accent-yellow);
       transform: rotate(3deg);
       z-index: 2;
       text-align: center;
-      min-width: 280px;
+      min-width: 240px;
+      max-width: 90%;
     }
-    .hero-stat-box .v{ font-family: var(--font-head); font-size: 40px; line-height: 1; }
+    .hero-stat-box .v{ font-family: var(--font-head); font-size: clamp(32px, 8vw, 40px); line-height: 1; }
 
     @keyframes float { 0%,100%{transform: translate(0,0);} 50%{transform: translate(0, -20px);} }
 
@@ -273,30 +283,31 @@
       z-index: 0;
     }
 
-    .tItem { display: grid; grid-template-columns: 60px 1fr; gap: 20px; position: relative; z-index: 1; }
+    .tItem { display: grid; grid-template-columns: 60px 1fr; gap: 16px; position: relative; z-index: 1; }
     .nodeBadge {
       width: 60px; height: 60px; background: var(--accent-lime); border: 3px solid var(--ink);
       display: grid; place-items: center; font-family: var(--font-head); font-size: 28px;
       box-shadow: 4px 4px 0 var(--ink);
+      flex-shrink: 0;
     }
     .tCard {
-      background: var(--paper); border: 3px solid var(--ink); padding: 24px;
+      background: var(--paper); border: 3px solid var(--ink); padding: 20px;
       box-shadow: 6px 6px 0 var(--ink);
       transition: transform 0.2s, background 0.2s;
     }
     .tCard::before {
-      content:""; position: absolute; left: -23px; top: 30px; width: 20px; height: 4px; background: var(--ink);
+      content:""; position: absolute; left: -19px; top: 30px; width: 16px; height: 4px; background: var(--ink);
     }
     
     .tItem.active .nodeBadge { background: var(--accent-pink); transform: scale(1.1); transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .tItem.active .tCard { background: var(--accent-yellow); transform: translateX(10px); }
+    .tItem.active .tCard { background: var(--accent-yellow); transform: translateX(5px); }
 
     /* ===== Simulation Brutalized ===== */
     .simWrap {
       border: var(--border-width) solid var(--ink);
       background: var(--paper);
-      padding: 32px;
-      box-shadow: 12px 12px 0 var(--ink);
+      padding: clamp(16px, 4vw, 32px);
+      box-shadow: clamp(6px, 1.5vw, 12px) clamp(6px, 1.5vw, 12px) 0 var(--ink);
     }
     .simGrid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 40px; }
     
@@ -305,36 +316,52 @@
     .label { font-weight: 700; margin-bottom: 8px; display: block; text-transform: uppercase; border-bottom: 2px solid var(--ink); padding-bottom: 4px; display: inline-block;}
     .valuePill { float: right; background: var(--ink); color: var(--accent-lime); padding: 2px 8px; font-family: var(--font-head); }
     
+    /* Better Touch Targets for Range */
     input[type="range"] {
-      -webkit-appearance: none; width: 100%; height: 12px; background: var(--ink);
+      -webkit-appearance: none; width: 100%; height: 16px; background: var(--ink);
       border-radius: 999px; outline: none; margin-top: 10px;
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none; appearance: none;
-      width: 24px; height: 24px; background: var(--accent-pink);
+      width: 28px; height: 28px; background: var(--accent-pink);
       border: 2px solid var(--ink); cursor: pointer;
       box-shadow: 2px 2px 0 var(--paper);
+      transition: transform 0.1s;
+    }
+    input[type="range"]::-webkit-slider-thumb:active {
+      transform: scale(1.2);
     }
     
     .miniBtn {
-      background: transparent; border: 2px solid var(--ink); padding: 6px 12px;
+      background: transparent; border: 2px solid var(--ink); padding: 8px 14px;
       font-weight: 700; cursor: pointer; margin-right: 8px; margin-top: 8px;
       box-shadow: 2px 2px 0 var(--ink);
       font-family: var(--font-body);
       transition: transform 0.1s;
+      /* Better touch target */
+      min-height: 40px; 
     }
     .miniBtn:hover { background: var(--ink); color: var(--paper); transform: translate(-1px,-1px); }
 
     .results { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; border-top: 3px solid var(--ink); padding-top: 20px; margin-top: 20px; }
     .resCard { text-align: right; background: #eee; border: 2px solid var(--ink); padding: 10px; }
-    .resK { font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; }
-    .resV { font-family: var(--font-head); font-size: 28px; line-height: 1; color: var(--ink); }
+    .resK { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; }
+    .resV { font-family: var(--font-head); font-size: clamp(20px, 4vw, 28px); line-height: 1; color: var(--ink); }
 
+    /* Canvas Container for Responsive */
+    .chartWrap {
+      position: relative;
+      width: 100%;
+      /* Canvas sizing is handled by JS mostly, but max-width ensures no overflow */
+      max-width: 100%; 
+    }
     canvas {
       border: 3px solid var(--ink);
       background: #fff;
       box-shadow: 6px 6px 0 var(--ink);
-      width: 100%; height: 350px;
+      width: 100%; 
+      height: 350px;
+      display: block; /* Remove inline gap */
     }
 
     /* ===== FAQ Brutalized ===== */
@@ -346,7 +373,7 @@
     .faqBtn {
       width: 100%; padding: 20px; border: none; background: transparent;
       display: flex; justify-content: space-between; align-items: center;
-      font-family: var(--font-body); font-weight: 700; font-size: 18px;
+      font-family: var(--font-body); font-weight: 700; font-size: clamp(16px, 4vw, 18px);
       cursor: pointer; text-align: left;
     }
     .faqIcon { font-size: 24px; font-weight: 900; }
@@ -364,21 +391,51 @@
       text-align: center; font-family: var(--font-head);
     }
 
-    /* ===== Responsive ===== */
+    /* Utility */
+    section { padding: 60px 0; border-bottom: 2px dashed var(--ink); }
+
+    /* ===== Responsive & Mobile Fixes ===== */
     @media (max-width: 900px) {
       .heroGrid, .simGrid, .grid2, .grid3 { grid-template-columns: 1fr; }
-      h1 { font-size: 60px; line-height: 0.9; }
-      .giant-text { font-size: 60px; }
-      .navLinks { display: none; } /* Hide nav on mobile for simplicity in this demo */
+      
+      .giant-text { font-size: clamp(48px, 15vw, 80px); }
+      
+      .navLinks { display: none; } /* Hide nav on mobile */
+      
+      /* Mobile Menu Button */
       .menuBtn { display: block; border: 2px solid var(--ink); background: var(--paper); padding: 8px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink);}
       .menuIcon span { display: block; width: 24px; height: 3px; background: var(--ink); margin: 4px 0; }
+      
+      /* Sim Results mobile stacking */
+      .results { grid-template-columns: 1fr 1fr; }
+      
+      /* Canvas height adjustment for mobile */
+      canvas { height: 280px; }
+      
+      /* Padding adjustments */
+      .container { width: 90vw; }
+      section { padding: 40px 0; }
+      
+      .b-card { padding: 24px; }
     }
+    
     @media (min-width: 901px) {
       .menuBtn { display: none; }
     }
 
-    /* Utility */
-    section { padding: 60px 0; border-bottom: 2px dashed var(--ink); }
+    /* Basics & Warnings Section Specific Fixes */
+    #basics {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    #basics .b-card {
+      /* Force black text inside cards even if section is dark */
+      color: var(--ink) !important;
+    }
+    #basics .b-card p {
+      color: var(--ink) !important;
+      font-weight: 600;
+    }
     
     /* Loader Brutal */
     .loader {
@@ -389,7 +446,7 @@
       border: 10px solid var(--ink);
     }
     .loader.hidden { transform: translateY(-100%); }
-    .loader-text { font-family: var(--font-head); font-size: 60px; color: var(--ink); text-transform: uppercase; animation: blink 0.5s infinite; }
+    .loader-text { font-family: var(--font-head); font-size: clamp(40px, 10vw, 60px); color: var(--ink); text-transform: uppercase; animation: blink 0.5s infinite; text-align: center; }
     @keyframes blink { 50% { opacity: 0; } }
 
   </style>
@@ -461,7 +518,7 @@
               <div class="k" style="font-weight: 700; font-size: 14px; letter-spacing: 0.1em; color: #555;">GAIN</div>
               <div class="v" style="color: var(--ink);">UNLIMITED</div>
               <div class="k" style="font-weight: 700; margin-top: 10px; font-size: 14px; letter-spacing: 0.1em; color: #555;">TAX</div>
-              <div class="v" style="color: var(--accent-pink); font-size: 60px;">0%</div>
+              <div class="v" style="color: var(--accent-pink); font-size: clamp(40px, 10vw, 60px);">0%</div>
             </div>
           </div>
         </div>
@@ -498,7 +555,7 @@
     </section>
 
     <!-- BASICS -->
-    <section id="basics" style="background: var(--ink); color: var(--paper);">
+    <section id="basics">
       <div class="container">
         <h2 style="background: var(--paper); color: var(--ink);">Basics & Warnings</h2>
         
@@ -781,11 +838,17 @@
     function drawChart(S, I) {
       // Resize
       const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      // Handle High DPI displays and ensuring width is correct for mobile
+      const dpr = window.devicePixelRatio || 1;
       
-      const w = canvas.width;
-      const h = canvas.height;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      // Scale context for DPI
+      ctx.scale(dpr, dpr);
+      
+      const w = rect.width;
+      const h = rect.height;
       const padLeft = 60; // Increased padding for Y axis labels
       const padBottom = 40;
       const padTop = 20;
